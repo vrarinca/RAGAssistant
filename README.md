@@ -69,4 +69,115 @@ Client (Swagger / OpenWebUI)
 
 ```bash
 docker run -p 6333:6333 -p 6334:6334 qdrant/qdrant
+```
+🔑 Configure Gemini API Key
 
+In GeminiService.cs, set your API key:
+```bash
+_gemini = new GeminiService("YOUR_GEMINI_API_KEY");
+```
+
+⚠️ Never commit your real API key to Git.
+Use environment variables or secrets for production.
+
+▶️ Run the API
+
+Start the .NET Web API:
+```bash
+dotnet run
+```
+
+Open Swagger UI in your browser:
+```bash
+https://localhost:7046/swagger
+```
+
+Note: The port may differ depending on your environment.
+
+🧪 Testing via Swagger
+🔹 Ingest Knowledge
+
+POST /api/ingest
+```bash
+{
+  "domain": "pharma",
+  "text": "Paracetamol is used for pain and fever. It can be combined with ibuprofen but should be avoided with alcohol. Patients with liver disease should use it cautiously.",
+  "source": "Pharma Guide 2026"
+}
+```
+
+Response:
+```bash
+{
+  "chunksStored": 1
+}
+```
+🔹 Ask Questions
+
+POST /api/chat
+```bash
+{
+  "domain": "pharma",
+  "question": "Can paracetamol be taken with ibuprofen?"
+}
+```
+
+Response:
+```bash
+{
+  "answer": "Yes, paracetamol can be combined with ibuprofen, but it should be avoided with alcohol."
+}
+```
+
+If the information is missing from the knowledge base, the assistant will reply:
+```bash
+I don't have enough data.
+```
+🧠 Prompting Rules
+
+The assistant is instructed to:
+
+Answer only using retrieved context
+
+Never invent information
+
+Explicitly state when data is missing
+
+This makes the system suitable for sensitive domains such as pharma, legal, and finance.
+
+🗂️ Multi-Domain Support
+
+Each domain is isolated:
+```bash
+"domain": "gaming"
+"domain": "pharma"
+"domain": "finance"
+```
+
+Each domain maps to its own Qdrant collection.
+
+🔒 Security Notes
+
+* Authentication is not implemented
+
+Do not expose this API publicly without:
+
+* Authentication
+
+* Rate limiting
+
+* Per-client domain isolation
+
+🛣️ Roadmap
+
+* File ingestion (PDF, CSV, DOCX)
+
+* Source citations in responses
+
+* Multi-tenant support
+
+* OpenWebUI integration
+
+* Admin dashboard
+
+* Relevance scoring and reranking
