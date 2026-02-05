@@ -1,0 +1,188 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vector AI Dashboard</title>
+
+    <style>
+        body {
+            font-family: Inter, Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        button {
+            margin-top: 12px;
+            padding: 10px 16px;
+            border-radius: 6px;
+            border: none;
+            background: #2563eb;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+            button.secondary {
+                background: #475569;
+            }
+
+            button:hover {
+                opacity: 0.9;
+            }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .answer-box {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 12px;
+            min-height: 80px;
+            white-space: pre-wrap;
+        }
+
+        .status {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .divider {
+            margin: 40px 0 20px;
+            font-weight: bold;
+            color: #334155;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <h1>Vector AI Dashboard - Admin</h1>
+
+        <div class="divider">Knowledge Management</div>
+
+        <!-- 📚 INGEST SECTION -->
+        <div class="row">
+
+            <!-- Add Raw Text -->
+            <div class="card">
+                <h2>Add Text Data</h2>
+
+                <input type="text" id="domainAdd" placeholder="Domain">
+                <input type="text" id="sourceAdd" placeholder="Source (optional)">
+                <textarea id="textAdd" rows="6" placeholder="Paste text to ingest..."></textarea>
+
+                <button class="secondary" onclick="addData()">Add Data</button>
+                <div class="status" id="addResult"></div>
+            </div>
+
+            <!-- Upload File -->
+            <div class="card">
+                <h2>Upload File</h2>
+
+                <input type="file" id="fileUpload">
+
+                <button class="secondary" onclick="uploadFile()">Upload & Ingest</button>
+                <div class="status" id="uploadResult"></div>
+
+                <p class="status">
+                    Filename format:<br>
+                    <strong>domain_source.txt</strong>
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        async function addData() {
+            const domain = document.getElementById("domainAdd").value;
+            const text = document.getElementById("textAdd").value;
+            const source = document.getElementById("sourceAdd").value;
+
+            if (!domain || !text) {
+                alert("Domain and text are required.");
+                return;
+            }
+
+            const response = await fetch("/api/ingest", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ domain, text, source })
+            });
+
+            const data = await response.json();
+            document.getElementById("addResult").innerText =
+                `Stored ${data.chunksStored} chunks.`;
+        }
+
+        async function uploadFile() {
+            const fileInput = document.getElementById("fileUpload");
+            if (!fileInput.files.length) {
+                alert("Select a file first");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            const response = await fetch("/api/ingest/file", {
+                method: "POST",
+                body: formData
+            });
+
+            const text = await response.text();
+
+            try {
+                const data = JSON.parse(text);
+                document.getElementById("uploadResult").innerText =
+                    `Domain: ${data.domain}, Stored ${data.chunksStored} chunks`;
+            } catch {
+                document.getElementById("uploadResult").innerText =
+                    "Upload failed: " + text;
+            }
+        }
+    </script>
+</body>
+</html>

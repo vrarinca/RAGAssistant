@@ -1,0 +1,142 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vector AI Dashboard</title>
+
+    <style>
+        body {
+            font-family: Inter, Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        button {
+            margin-top: 12px;
+            padding: 10px 16px;
+            border-radius: 6px;
+            border: none;
+            background: #2563eb;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+            button.secondary {
+                background: #475569;
+            }
+
+            button:hover {
+                opacity: 0.9;
+            }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .answer-box {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 12px;
+            min-height: 80px;
+            white-space: pre-wrap;
+        }
+
+        .status {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .divider {
+            margin: 40px 0 20px;
+            font-weight: bold;
+            color: #334155;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <h1>Vector AI Dashboard - User</h1>
+
+        <!-- 🔝 CHAT SECTION -->
+        <div class="card">
+            <h2>Ask a Question</h2>
+
+            <!--<input type="text" id="domainQuestion" placeholder="Domain (e.g. finance, legal, it)">-->
+            <textarea id="question" rows="3" placeholder="Ask your question here..."></textarea>
+
+            <button onclick="askQuestion()">Ask</button>
+
+            <div class="answer-box" id="answer">Answer will appear here…</div>
+        </div>
+
+
+    </div>
+
+    <script>
+
+        async function askQuestion() {
+            //const domain = document.getElementById("domainQuestion").value;
+            const domain = window.location.pathname.split("/")[1];
+            const question = document.getElementById("question").value;
+
+            if (!domain || !question) {
+                alert("Domain and question are required.");
+                return;
+            }
+
+            document.getElementById("answer").innerText = "Thinking…";
+
+            const response = await fetch("/api/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ domain, question })
+            });
+
+            const data = await response.json();
+            document.getElementById("answer").innerText = data.answer;
+        }
+    </script>
+</body>
+</html>

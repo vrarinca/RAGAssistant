@@ -1,21 +1,22 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("api/[controller]")]
-public class IngestController : ControllerBase
+[Route("admin/{domain}/ingest")]
+[Authorize] // only logged-in admins
+public class AdminController : ControllerBase
 {
     private readonly VectorDbService _vectorDb;
     private readonly GeminiService _gemini;
 
-    public IngestController(VectorDbService vectorDb, GeminiService gemini)
+    public AdminController(VectorDbService vectorDb, GeminiService gemini)
     {
         _vectorDb = vectorDb;
         _gemini = gemini;
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Ingest([FromBody] IngestRequest request)
+    [HttpPost("text")]
+    public async Task<IActionResult> AddText([FromBody] IngestRequest request)
     {
         var chunks = SplitText(request.Text, 500);
 
@@ -41,7 +42,7 @@ public class IngestController : ControllerBase
     }
 
     [HttpPost("file")]
-    public async Task<IActionResult> IngestFile(IFormFile file)
+    public async Task<IActionResult> UploadFile(IFormFile file)
     {
         if (file == null || file.Length == 0)
             return BadRequest("No file uploaded.");
@@ -88,7 +89,6 @@ public class IngestController : ControllerBase
             chunksStored = chunks.Count
         });
     }
-
     private List<string> SplitText(string text, int chunkSize)
     {
         var words = text.Split(' ');
@@ -100,15 +100,4 @@ public class IngestController : ControllerBase
         return chunks;
     }
 
-    private async Task<float[]> GetEmbedding(string text)
-    {
-        return await _gemini.GetEmbeddingAsync(text);
-    }
-}
-
-public class IngestRequest
-{
-    public string Domain { get; set; }
-    public string Text { get; set; }
-    public string Source { get; set; }
 }

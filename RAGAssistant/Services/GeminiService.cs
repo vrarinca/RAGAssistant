@@ -8,9 +8,9 @@ public class GeminiService
     private readonly string _apiKey;
     private readonly RestClient _client;
 
-    public GeminiService(string apiKey)
+    public GeminiService(IConfiguration config)
     {
-        _apiKey = apiKey;
+        _apiKey = config["Gemini:ApiKey"];
         _client = new RestClient("https://generativelanguage.googleapis.com/v1beta");
     }
 

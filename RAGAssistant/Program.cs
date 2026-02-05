@@ -7,6 +7,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSingleton<VectorDbService>();
+builder.Services.AddSingleton<GeminiService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -17,6 +20,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
 
 app.UseAuthorization();
 

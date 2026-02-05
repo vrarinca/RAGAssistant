@@ -1,0 +1,61 @@
+Networking Basics Overview
+
+Computer networking is the practice of connecting computers and devices so they can communicate and share resources. A network allows systems to exchange data, access shared services, and coordinate tasks.
+
+Types of Networks
+
+A Local Area Network (LAN) connects devices within a limited geographic area such as an office, home, or building. LANs typically use Ethernet or Wi-Fi technologies.
+
+A Wide Area Network (WAN) spans large geographic areas, often connecting multiple LANs. The internet is the largest example of a WAN.
+
+A Metropolitan Area Network (MAN) covers a city or large campus and sits between LAN and WAN in scale.
+
+Network Devices
+
+A router connects different networks together and forwards data packets based on IP addresses. Routers often provide internet access and network segmentation.
+
+A switch connects devices within the same network and uses MAC addresses to forward traffic efficiently.
+
+A firewall monitors and controls incoming and outgoing network traffic based on security rules to protect systems from unauthorized access.
+
+An access point allows wireless devices to connect to a wired network using Wi-Fi.
+
+IP Addressing
+
+An IP address uniquely identifies a device on a network. IPv4 addresses are 32-bit numbers written in dotted decimal format, such as 192.168.1.1.
+
+IPv6 addresses are 128-bit and were introduced to address IPv4 exhaustion.
+
+Protocols
+
+TCP is a connection-oriented protocol that ensures reliable data delivery.
+
+UDP is a connectionless protocol optimized for speed and low latency.
+
+HTTP and HTTPS are application-layer protocols used for web communication.
+
+DNS translates human-readable domain names into IP addresses.
+
+Network Security Concepts
+
+Encryption protects data confidentiality during transmission.
+
+Authentication verifies the identity of users or systems.
+
+Authorization determines what actions an authenticated entity is allowed to perform.
+
+Firewalls and intrusion detection systems are commonly used to secure networks.
+
+Common Troubleshooting Steps
+
+Check physical connections and link lights.
+
+Verify IP configuration and network settings.
+
+Test connectivity using tools like ping and traceroute.
+
+Review firewall rules and security policies.
+
+Summary
+
+Understanding basic networking concepts is essential for IT operations, cybersecurity, and system design. Networks rely on standardized protocols and devices to provide reliable communication between systems.

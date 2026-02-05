@@ -5,11 +5,12 @@ public class VectorDbService
 {
     private readonly QdrantClient _client;
 
-    public VectorDbService()
+    public VectorDbService(IConfiguration config)
     {
-        // For local Qdrant, the gRPC port is 6334 (HTTP is 6333)
-        // The .NET SDK uses gRPC for better performance.
-        _client = new QdrantClient("localhost", 6334);
+        var host = config["Qdrant:Host"];
+        var port = int.Parse(config["Qdrant:GrpcPort"]);
+
+        _client = new QdrantClient(host, port);
     }
 
     public async Task UpsertAsync(string collectionName, ulong id, float[] vector, Dictionary<string, object> payload)

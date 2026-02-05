@@ -7,10 +7,10 @@ public class ChatController : ControllerBase
     private readonly VectorDbService _vectorDb;
     private readonly GeminiService _gemini;
 
-    public ChatController()
+    public ChatController(VectorDbService vectorDb, GeminiService gemini)
     {
-        _vectorDb = new VectorDbService();
-        _gemini = new GeminiService("API-KEY");
+        _vectorDb = vectorDb;
+        _gemini = gemini;
     }
 
     [HttpPost]
