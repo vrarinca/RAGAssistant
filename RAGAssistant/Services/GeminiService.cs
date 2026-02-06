@@ -16,13 +16,17 @@ public class GeminiService
 
     public async Task<float[]> GetEmbeddingAsync(string text)
     {
-        var request = new RestRequest("models/text-embedding-004:embedContent", Method.Post);
+        var request = new RestRequest("models/gemini-embedding-001:embedContent", Method.Post);
 
         request.AddQueryParameter("key", _apiKey);
 
         var body = new
         {
-            content = new { parts = new[] { new { text = text } } }
+            model = "models/gemini-embedding-001",
+            content = new { parts = new[] { new { text = text } } },
+            // 2. Add task_type (RETRIEVAL_DOCUMENT for indexing, RETRIEVAL_QUERY for searching)
+            task_type = "RETRIEVAL_DOCUMENT",
+            outputDimensionality = 768
         };
         request.AddJsonBody(body);
 
