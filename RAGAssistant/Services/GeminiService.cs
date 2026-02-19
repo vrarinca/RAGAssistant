@@ -42,30 +42,56 @@ public class GeminiService
 
     public async Task<string> GetLlmAnswerAsync(string prompt)
     {
-        var request = new RestRequest("models/gemini-3-flash-preview:generateContent", Method.Post);
-        request.AddQueryParameter("key", _apiKey);
+        int retries = 3;
+        int delay = 1000;
 
-        var body = new
+        for (int i = 0; i < retries; i++)
         {
-            contents = new[]
+            var request = new RestRequest("models/gemini-3-flash-preview:generateContent", Method.Post);
+            request.AddQueryParameter("key", _apiKey);
+
+            var body = new
             {
+                contents = new[]
+                {
                 new { parts = new[] { new { text = prompt } } }
             },
-            generationConfig = new
+                generationConfig = new
+                {
+                    temperature = 0.1,
+                    maxOutputTokens = 1024
+                }
+            };
+
+            request.AddJsonBody(body);
+
+            var response = await _client.ExecuteAsync(request);
+
+            //dynamic parsing
+            if (response.IsSuccessful && response.Content != null)
             {
-                temperature = 0.1,
-                maxOutputTokens = 1024
+                dynamic result = JsonConvert.DeserializeObject(response.Content);
+
+                if (result?.candidates != null && result.candidates.Count > 0)
+                {
+                    return result.candidates[0].content.parts[0].text?.ToString() ?? "";
+                }
+
+                return "AI response was empty.";
             }
-        };
-        request.AddJsonBody(body);
 
-        var response = await _client.ExecuteAsync(request);
-        if (!response.IsSuccessful)
+            //treating This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.
+            if ((int)response.StatusCode == 503)
+            {
+                await Task.Delay(delay);
+                delay *= 2;
+                continue;
+            }
+
             throw new Exception($"Gemini LLM error: {response.Content}");
+        }
 
-        dynamic result = JsonConvert.DeserializeObject(response.Content);
-
-        string answer = result.candidates[0].content.parts[0].text;
-        return answer;
+        return "The AI service is currently busy. Please try again in a moment.";
     }
+
 }
