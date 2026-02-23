@@ -122,6 +122,15 @@ Hello 👋 Ask me anything.
 
     <script>
 
+        function getChatId() {
+            let chatId = localStorage.getItem("chatId");
+            if (!chatId) {
+                chatId = crypto.randomUUID();
+                localStorage.setItem("chatId", chatId);
+            }
+            return chatId;
+        }
+
         function addMessage(content, role) {
             const container = document.getElementById("chatMessages");
             const message = document.createElement("div");
@@ -142,6 +151,7 @@ Hello 👋 Ask me anything.
             const domain = window.location.pathname.split("/")[1];
             const questionInput = document.getElementById("question");
             const question = questionInput.value.trim();
+            const chatId = getChatId();
 
             if (!domain || !question) return;
 
@@ -153,7 +163,7 @@ Hello 👋 Ask me anything.
             const response = await fetch("/api/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ domain, question })
+                body: JSON.stringify({ domain, question, chatId })
             });
 
             const data = await response.json();

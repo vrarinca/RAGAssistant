@@ -34,7 +34,7 @@ public class ChatController : ControllerBase
             Question:
             {request.Question}";
 
-        var answer = await GetLlmAnswer(prompt);
+        var answer = await GetLlmAnswer(request.ChatId, prompt);
 
         return Ok(new { answer });
     }
@@ -44,9 +44,9 @@ public class ChatController : ControllerBase
         return await _gemini.GetEmbeddingAsync(text);
     }
 
-    private async Task<string> GetLlmAnswer(string prompt)
+    private async Task<string> GetLlmAnswer(string chatId, string prompt)
     {
-        return await _gemini.GetLlmAnswerAsync(prompt);
+        return await _gemini.GetLlmAnswerAsync(chatId, prompt);
     }
 }
 
@@ -54,4 +54,5 @@ public class ChatRequest
 {
     public string Domain { get; set; }
     public string Question { get; set; }
+    public string ChatId { get; set; }
 }

@@ -31,7 +31,7 @@ public class UserController : ControllerBase
             Question:
             {request.Question}";
 
-        var answer = await _gemini.GetLlmAnswerAsync(prompt);
+        var answer = await _gemini.GetLlmAnswerAsync(request.ChatId, prompt);
         return Ok(new { answer });
     }
 }

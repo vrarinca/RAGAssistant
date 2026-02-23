@@ -7,6 +7,7 @@ public class GeminiService
 {
     private readonly string _apiKey;
     private readonly RestClient _client;
+    private readonly Dictionary<string, List<string>> _memory = new();
 
     public GeminiService(IConfiguration config)
     {
@@ -40,10 +41,23 @@ public class GeminiService
         return ((IEnumerable<dynamic>)values).Select(v => (float)v).ToArray();
     }
 
-    public async Task<string> GetLlmAnswerAsync(string prompt)
+    public async Task<string> GetLlmAnswerAsync(string chatId, string prompt)
     {
         int retries = 3;
         int delay = 1000;
+
+        if (!_memory.ContainsKey(chatId))
+            _memory[chatId] = new List<string>();
+
+        var history = _memory[chatId];
+
+        history.Add($"User: {prompt}");
+
+        //Limit memory size
+        if (history.Count > 3)
+            history.RemoveRange(0, history.Count - 3);
+
+        var fullPrompt = string.Join("\n", history) + "\nAssistant:";
 
         for (int i = 0; i < retries; i++)
         {
@@ -54,7 +68,7 @@ public class GeminiService
             {
                 contents = new[]
                 {
-                new { parts = new[] { new { text = prompt } } }
+                new { parts = new[] { new { text = fullPrompt } } }
             },
                 generationConfig = new
                 {
@@ -74,7 +88,13 @@ public class GeminiService
 
                 if (result?.candidates != null && result.candidates.Count > 0)
                 {
-                    return result.candidates[0].content.parts[0].text?.ToString() ?? "";
+                    string aiResponse =
+                        result.candidates[0].content.parts[0].text?.ToString() ?? "";
+
+                    //Save AI reply memory
+                    history.Add($"Assistant: {aiResponse}");
+
+                    return aiResponse;
                 }
 
                 return "AI response was empty.";
